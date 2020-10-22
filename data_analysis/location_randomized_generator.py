@@ -1,18 +1,10 @@
-import pandas as pd
 import numpy as np
-import os
 import math
-import folium
-from folium import plugins
-import webbrowser
-from folium.plugins import HeatMap
 import matplotlib.pyplot as plt
 import seaborn as sns
-import random
-import json
 
 
-class LocationLDP(object):
+class LocationRandomizedGenerator(object):
     def __init__(self, latitude_file_path, longitude_file_path, map_size,
                  unit_width):
         """
@@ -33,10 +25,15 @@ class LocationLDP(object):
         self.unit_width = unit_width
         self.number_of_locations = 0
         self.read_data_from_file()
-        self.perturbed_location_matrix = None
         self.matrix_x_width = None
         self.matrix_y_width = None
         self.divide_map_to_blocks()
+        self.source_location_matrix = np.zeros(
+            [self.matrix_y_width, self.matrix_x_width])
+        self.perturbed_location_matrix = np.zeros(
+            [self.matrix_y_width, self.matrix_x_width])
+
+        self.perturbed_location_matrix.sum()
 
     def read_data_from_file(self):
         # read data
@@ -53,30 +50,18 @@ class LocationLDP(object):
             for lon in c:
                 self.longitudes.append(float(lon))
 
-    def get_init_statistics(self):
-        self.perturbed_location_matrix = np.zeros(
-            [self.matrix_y_width, self.matrix_x_width])
-        for i in range(self.number_of_locations):
-            lat = self.latitudes[i]
-            lon = self.longitudes[i]
-            block = self.get_current_block(lat, lon)
-            self.perturbed_location_matrix[block[0], block[1]] += 1
-
     def divide_map_to_blocks(self):
         self.matrix_x_width = int((self.right_lat - self.left_lat) /
                                   self.unit_width) + 1
         self.matrix_y_width = int((self.high_lon - self.low_lon) /
                                   self.unit_width) + 1
 
-    def perturb_location(self, privacy, safe_boundary):
-        self.perturbed_location_matrix = np.zeros(
-            [self.matrix_y_width, self.matrix_x_width])
+    def get_source_map(self):
         for i in range(self.number_of_locations):
             lat = self.latitudes[i]
             lon = self.longitudes[i]
             block = self.get_current_block(lat, lon)
-            x, y = self.random_generator(privacy, safe_boundary, block)
-            self.perturbed_location_matrix[y, x] += 1
+            self.source_location_matrix[block[0], block[1]] += 1
 
     def get_current_block(self, c_lat, c_lon):
         x = math.floor((c_lat - self.left_lat) / self.unit_width)
@@ -113,6 +98,12 @@ class LocationLDP(object):
                     safe_blocks.append([lat+i, lon-j])
         return number_of_blocks, safe_blocks
 
+    def perturb_location(self, privacy, safe_boundary):
+        """
+        use self.perturbed_location_matrix to get perturbed results
+        """
+        pass
+
     def random_generator(self, privacy, safe_boundary, current_block):
         """
         :param privacy:
@@ -120,25 +111,7 @@ class LocationLDP(object):
         :param current_location: (lat, lon) --> (x, y)
         :return:
         """
-        e_privacy = math.exp(privacy)
-        number_of_blocks = 0
-        safe_blocks = []
-        for i in range(1, safe_boundary+1):
-            s_num, s_blocks = self.get_safe_boundary(current_block, i)
-            if s_num != 0:
-                safe_blocks.extend(s_blocks)
-                number_of_blocks += s_num
-        print(number_of_blocks)
-
-        p_positive = e_privacy / (e_privacy + number_of_blocks)
-        p_negative = 1 / (e_privacy + number_of_blocks)
-
-        p = random.uniform(0, 1)
-        if p <= p_positive:
-            return current_block[1], current_block[0]
-        else:
-            num = math.ceil((p - p_positive) / p_negative)
-            return safe_blocks[num-1][0], safe_blocks[num-1][1]
+        pass
 
     def show_perturbed_results(self):
         sns.set()
@@ -166,3 +139,5 @@ class LocationLDP(object):
         # ax.set_ylabel("longitude")
         # ax.set_yticklabels([i*(high_lon - low_lon)/10 for i in range(10)])
         plt.show()
+
+
