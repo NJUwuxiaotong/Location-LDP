@@ -13,6 +13,7 @@ class PersonalizedLocationPrivacy(LocationRandomizedGenerator):
             block = self.get_current_block(lat, lon)
             x, y = self.random_generator(privacy, safe_boundary, block)
             self.perturbed_location_matrix[y, x] += 1
+            self.source_mapping_perturb.append([x, y])
 
     def random_generator(self, privacy, safe_boundary, current_block):
         """
