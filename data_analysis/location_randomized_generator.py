@@ -6,6 +6,34 @@ import seaborn as sns
 from geopy.distance import geodesic
 
 
+def show_perturbed_results(matrix_data, vmax=2000, vmin=0):
+    sns.set()
+    plt.figure()
+    plt.subplots(figsize=(6, 5))
+
+    # Reds, OrRd, Blues, BuPu
+    sns_plot = sns.heatmap(matrix_data,
+                           cmap='hot',  # 'YlGnBu', 'hot'
+                           vmax=vmax, vmin=vmin,
+                           xticklabels=False,
+                           yticklabels=False,
+                           cbar=False,
+                           robust=True,
+                           cbar_kws={"orientation": "horizontal",
+                                     "size": 30})
+    cb = sns_plot.figure.colorbar(sns_plot.collections[0])
+    cb.ax.tick_params(labelsize=18, labelbottom=True)
+
+    # fig.savefig("heatmap.pdf", bbox_inches='tight')
+    # ax.set_title('Amounts per kind and region')
+    # ax.set_xlabel('latitude')
+    # ax.set_xticklabels(x_labels)
+    # ax.set_xticks(x_labels)
+    # ax.set_ylabel("longitude")
+    # ax.set_yticklabels([i*(high_lon - low_lon)/10 for i in range(10)])
+    plt.show()
+
+
 class LocationRandomizedGenerator(object):
     def __init__(self, latitude_file_path, longitude_file_path, map_size,
                  unit_width):
@@ -115,33 +143,6 @@ class LocationRandomizedGenerator(object):
         :return:
         """
         pass
-
-    def show_perturbed_results(self, vmax=2000, vmin=0):
-        sns.set()
-        plt.figure()
-        plt.subplots(figsize=(6, 5))
-
-        # Reds, OrRd, Blues, BuPu
-        sns_plot = sns.heatmap(self.perturbed_location_matrix,
-                               cmap='hot',   # 'YlGnBu', 'hot'
-                               vmax=vmax, vmin=vmin,
-                               xticklabels=False,
-                               yticklabels=False,
-                               cbar=False,
-                               robust=True,
-                               cbar_kws={"orientation": "horizontal",
-                                         "size": 30})
-        cb = sns_plot.figure.colorbar(sns_plot.collections[0])
-        cb.ax.tick_params(labelsize=18, labelbottom=True)
-
-        # fig.savefig("heatmap.pdf", bbox_inches='tight')
-        # ax.set_title('Amounts per kind and region')
-        # ax.set_xlabel('latitude')
-        # ax.set_xticklabels(x_labels)
-        # ax.set_xticks(x_labels)
-        # ax.set_ylabel("longitude")
-        # ax.set_yticklabels([i*(high_lon - low_lon)/10 for i in range(10)])
-        plt.show()
 
     def get_privacy_preservation_effect(self):
         for i in range(self.number_of_locations):
