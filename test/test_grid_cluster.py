@@ -12,7 +12,7 @@ low_lon = 116.29
 high_lon = 116.33
 
 unit_width = 0.00032  # 0.00008  0.00016 0.00032
-percentage = 0.2
+percentage = 0.5
 
 test_gc = TestGridCluster(latitude_file, longitude_file,
                           [left_lat, right_lat, low_lon, high_lon],

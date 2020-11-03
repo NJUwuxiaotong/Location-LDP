@@ -64,6 +64,7 @@ class LocationRandomizedGenerator(object):
             [self.matrix_y_width, self.matrix_x_width])
         self.source_mapping_perturb = list()
         self.preservation_effect = 0
+        self.distance_of_perturbed_grids = 0
         # self.perturbed_location_matrix.sum()
 
     def read_data_from_file(self):
@@ -98,7 +99,7 @@ class LocationRandomizedGenerator(object):
         x = math.floor((c_lat - self.left_lat) / self.unit_width)
         y = math.floor((c_lon - self.low_lon) / self.unit_width)
         # s_matrix[y_width - y - 1, x - 1] += 1
-        return self.matrix_y_width - y - 1, x - 1
+        return self.matrix_y_width - y - 1, x
 
     def get_safe_boundary(self, current_block, safe_boundary):
         lon = current_block[0]
@@ -156,7 +157,14 @@ class LocationRandomizedGenerator(object):
 
             self.preservation_effect += geodesic(
                 (lat, lon), (perturbed_lat, perturbed_lon)).m
-        self.preservation_effect /= self.number_of_locations
 
-    def accuracy(self):
-        pass
+            block = self.get_current_block(lat, lon)
+            self.distance_of_perturbed_grids += \
+                math.fabs(self.source_mapping_perturb[i][0] - block[1]) + \
+                math.fabs(self.source_mapping_perturb[i][1] - block[0])
+
+            if i % 10000 == 0:
+                print("Having processed %s\n" % i)
+
+        self.preservation_effect /= self.number_of_locations
+        self.distance_of_perturbed_grids /= self.number_of_locations

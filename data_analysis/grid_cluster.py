@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 
 
@@ -111,6 +112,40 @@ class GridCluster(object):
             tab_locations_list.append(tab_locations)
         return tab_num_list, tab_locations_list
 
+    def get_clusters_with_most_grids(self, top_k):
+        tab_num_list, tab_locations_list = self.get_clusters()
+        grid_num_of_tab = list()
+        for tab_locations in tab_locations_list:
+            grid_num = len(tab_locations)
+            grid_num_of_tab.append(grid_num)
+
+        if top_k > len(grid_num_of_tab):
+            print("Error: Top k(i.e., %s) exceeds the number of tabs %s" %
+                  (top_k, len(grid_num_of_tab)))
+            exit(1)
+
+        grid_num_list_bak = copy.deepcopy(grid_num_of_tab)
+        grid_num_list_bak.sort()
+        grid_num_list_bak.reverse()
+        top_k_grid_list = grid_num_list_bak[:top_k]
+        top_k_index = list()
+        for i in range(top_k):
+            value = top_k_grid_list[i]
+            if i == 0:
+                pos = tab_num_list.index(value)
+                top_k_index.append(pos)
+            elif top_k_grid_list[i] == top_k_grid_list[i-1]:
+                pos = tab_num_list.index(value, top_k_index[i-1] + 1)
+                top_k_index.append(pos)
+            else:
+                pos = tab_num_list.index(value)
+                top_k_index.append(pos)
+
+        clusters = list()
+        for i in range(top_k):
+            clusters.append(tab_locations_list[top_k_index[i]])
+        return clusters
+
     def get_percentage(self):
         num = 0
         for i in range(self._matrix_length):
@@ -121,30 +156,30 @@ class GridCluster(object):
 
 
 class GridClusterComparison(object):
-    def __init__(self, matrix_length, matrix_width):
-        self.matrix_length = matrix_length
-        self.matrix_width = matrix_width
-
     def get_number_of_clusters_for_comparison(self, src_cluster, dst_cluster):
         """
         function: the number of clusters in source cluster
-        src_cluster: a list of locations [l1, l2, ..., ln]
+        src_cluster: a list of locations [[l1, ..., ln], ..., [l1, ..., lm]]
         dst_cluster: cluster grid --- matrix [][]
         return:
         """
-        clusters = list()
-        location_num = 0
-        for location in src_cluster:
-            lon = location[0]
-            lat = location[1]
-            tab = dst_cluster[lon, lat]
-            if tab != 0:
-                location_num += 1
-                if tab not in clusters:
-                    clusters[tab] = [[lon, lat]]
-                else:
-                    clusters[tab].append([lon, lat])
-        return location_num, clusters
-
-    def compare_two_grid_clusters(self, src_cluster, dst_cluster):
-        pass
+        cluster_results = 0
+        grid_results = 0
+        total_grid_num = 0
+        for locations in src_cluster:
+            clusters = list()
+            grid_num = 0
+            total_grid_num += len(locations)
+            for location in locations:
+                lon = location[0]
+                lat = location[1]
+                tab = dst_cluster[lon, lat]
+                if tab != 0:
+                    grid_num += 1
+                    if tab not in clusters:
+                        clusters[tab] = [[lon, lat]]
+                    else:
+                        clusters[tab].append([lon, lat])
+            cluster_results += len(clusters)
+            grid_results += grid_num
+        return cluster_results, grid_results/total_grid_num

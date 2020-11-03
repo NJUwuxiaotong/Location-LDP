@@ -21,23 +21,35 @@ class TestPersonalizedLocationPrivacy(object):
             self.unit_width)
 
         ldp.get_source_map()
-        start_t = time.time()
+        perturb_start_t = time.time()
         ldp.perturb_location(privacy, safe_boundary)
-        end_t = time.time()
-        show_perturbed_results(ldp.perturbed_location_matrix)
+        perturb_end_t = time.time()
+        # show_perturbed_results(ldp.perturbed_location_matrix)
         ldp.get_privacy_preservation_effect()
         privacy_effect = ldp.preservation_effect
+        privacy_grid_distance = ldp.distance_of_perturbed_grids
 
         shape = ldp.perturbed_location_matrix.shape
-        percentage = 0.1
-        threshold = get_max_number_of_matrix(ldp.perturbed_location_matrix,
-                                             percentage)
+        threshold = get_max_number_of_matrix(
+            ldp.perturbed_location_matrix, percentage)
         gc = GridCluster(ldp.perturbed_location_matrix, shape[0], shape[1],
                          threshold)
+        cluster_start_t = time.time()
         gc.cluster()
+        cluster_end_t = time.time()
         gc.get_tabs()
 
         print('-------------- Result --------------\n')
         print("Tab num: %s" % gc.tab_number)
-        print("Time: %s" % (end_t - start_t))
         print("Percentage: %s" % gc.get_percentage())
+        print('------------------------------------')
+        print("Preservation effect [distance]: %s" % privacy_effect)
+        print("[Privacy Preservation] grid distance --> %s\n" %
+              privacy_grid_distance)
+        print('------------------------------------')
+        perturb_time = perturb_end_t - perturb_start_t
+        cluster_time = cluster_end_t - cluster_start_t
+        print("Perturb Time: %s\n" % perturb_time)
+        print('Grid Time: %s\n'% cluster_time)
+        print('Total time: %s\n' % (perturb_time + cluster_time))
+        print('------------------------------------')

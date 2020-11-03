@@ -22,11 +22,14 @@ class TestGridCluster(object):
         shape = ldp.source_location_matrix.shape
         threshold = get_max_number_of_matrix(ldp.source_location_matrix,
                                              self.percentage)
-        gc = GridCluster(ldp.source_location_matrix, shape[0], shape[1], threshold)
+        gc = GridCluster(
+            ldp.source_location_matrix, shape[0], shape[1], threshold)
         start_t = time.time()
         gc.cluster()
         end_t = time.time()
         gc.get_tabs()
+
+        gc.get_tab_index_with_most_grids(2)
 
         # show_perturbed_results(gc.cluster_matrix, vmax=1)
         print('-------------- Result --------------\n')

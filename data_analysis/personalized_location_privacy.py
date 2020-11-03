@@ -11,6 +11,7 @@ class PersonalizedLocationPrivacy(LocationRandomizedGenerator):
             lat = self.latitudes[i]
             lon = self.longitudes[i]
             block = self.get_current_block(lat, lon)
+            # x: latitude, y: longitude
             x, y = self.random_generator(privacy, safe_boundary, block)
             self.perturbed_location_matrix[y, x] += 1
             self.source_mapping_perturb.append([x, y])
