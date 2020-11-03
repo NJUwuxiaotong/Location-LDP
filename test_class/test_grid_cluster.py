@@ -29,8 +29,6 @@ class TestGridCluster(object):
         end_t = time.time()
         gc.get_tabs()
 
-        gc.get_tab_index_with_most_grids(2)
-
         # show_perturbed_results(gc.cluster_matrix, vmax=1)
         print('-------------- Result --------------\n')
         print("Tab num: %s" % gc.tab_number)

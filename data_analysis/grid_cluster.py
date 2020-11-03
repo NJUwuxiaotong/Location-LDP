@@ -61,6 +61,7 @@ class GridCluster(object):
 
     def get_tabs(self):
         self.tab_number = self._tab
+        return self.tab_number
 
     def find_neighbor_exceed_threshold(self, center_location):
         cluster = list()
