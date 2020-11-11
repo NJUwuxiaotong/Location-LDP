@@ -168,7 +168,7 @@ class GridClusterComparison(object):
         grid_results = 0
         total_grid_num = 0
         for locations in src_cluster:
-            clusters = list()
+            clusters = dict()
             grid_num = 0
             total_grid_num += len(locations)
             for location in locations:
@@ -177,6 +177,7 @@ class GridClusterComparison(object):
                 tab = dst_cluster[lon, lat]
                 if tab != 0:
                     grid_num += 1
+                    tab = int(tab)
                     if tab not in clusters:
                         clusters[tab] = [[lon, lat]]
                     else:

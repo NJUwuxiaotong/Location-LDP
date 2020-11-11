@@ -152,9 +152,8 @@ class LocationRandomizedGenerator(object):
 
             perturbed_lat = self.left_lat \
                 + self.source_mapping_perturb[i][0] * self.unit_width
-            perturbed_lon = self.low_lon \
-                + self.source_mapping_perturb[i][1] * self.unit_width
-
+            perturbed_lon = self.high_lon \
+                - self.source_mapping_perturb[i][1] * self.unit_width
             self.preservation_effect += geodesic(
                 (lat, lon), (perturbed_lat, perturbed_lon)).m
 
@@ -166,5 +165,6 @@ class LocationRandomizedGenerator(object):
             if i % 10000 == 0:
                 print("Having processed %s\n" % i)
 
+        print(self.preservation_effect)
         self.preservation_effect /= self.number_of_locations
         self.distance_of_perturbed_grids /= self.number_of_locations
